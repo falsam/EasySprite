@@ -1,2 +1,2 @@
 # EasySprite
-2D libray for game development.
+2D JavaScript libray for game development.
