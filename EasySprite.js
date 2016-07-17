@@ -1,7 +1,7 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.6.0
+ * Version 	: 1.6.5
  *
  * Released under The MIT License (MIT)
  *
@@ -410,13 +410,13 @@
 	
 	// sprite - Scroll 
 	function scrollSprite(sprite, x, y, stepX, stepY, width, height) {
-		var spriteWidth  = sprite.width;
-		var spriteHeight = sprite.height;
+		var spriteWidth  = width; 
+		var spriteHeight = height; 
 		var sx, sy;
   
-		if (width === void(0)) {width = sprite.width};
-		if (height === void(0)) {height = sprite.height};
-	
+		if (width === void(0)) {width = sprite.scale.width};
+		if (height === void(0)) {height = sprite.scale.height};
+		
 		sprite.PositionX += stepX;
 		sprite.PositionY += stepY;
 		
