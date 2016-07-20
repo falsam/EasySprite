@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+
+	<title>Anchor and Rotate Sprite</title>
+	
+	<!-- Insert EasySprite -->
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+	// Setup screen
+	openScreen("game", 0, 0, 800, 600, renderGame);	
+	
+	var background = loadSprite("assets/image/blur1.jpg	");
+	var logo = loadSprite("assets/image/html5logo.png");
+	anchorSprite(logo, 0.5, 0.5);
+	// Render screen
+	function renderGame() {
+		displaySprite(background, 0, 0, 800, 600);
+		displaySprite(logo, 400, 300);
+		
+		//Rotate Sprite (Relatif)
+		rotateSprite(logo, 0.2, true);
+	};
+</script>
+</body>
+</html>
