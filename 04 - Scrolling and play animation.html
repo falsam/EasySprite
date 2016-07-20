@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+
+	<title>Scrolling and play animation.</title>
+	
+	<!-- Insert EasySprite -->
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+    openScreen("game", 0, 0, 800, 600, renderGame);
+    
+    initKeyboard();
+
+    var backgroundStepX = 0;
+    var scrollStepX = 0;
+    var x = 400
+    var y = 200
+
+    var background = loadSprite("assets/image/background0.jpg");
+    var ground = loadSprite("assets/image/ground.jpg");
+    var bird = loadSprite("assets/image/bird.png", onLoadSuccess)
+
+    function onLoadSuccess() {                
+        if (isSprite(bird) === true) {
+            anchorSprite(bird, 0.5, 0.5);
+
+            addAnimation(bird, "left", [0,1,2,3], 64, 64, 150);
+            addAnimation(bird, "right", [4,5,6,7], 64, 64, 90);
+            addAnimation(bird, "standby", [12,13,14,15], 64, 64, 90);
+        }
+    }
+    
+    function renderGame() {    
+        // Scrolling
+        scrollSprite(background, 0, 0, scrollStepX, 0, 800, 600)
+        scrollSprite(ground, 0, 500, scrollStepX * 1.3, 0, 800, 100)
+        
+        // Display bird
+        displaySprite(bird, x, y, 64, 64);    
+        
+        // Keyboard event
+        if (keyboardPushed(KEY_RIGHT)) { 
+            x += 5; // To the right
+            playAnimation(bird, "right");
+    
+        } else if (keyboardPushed(KEY_LEFT)) { 
+            x -= 5; // To the left
+            playAnimation(bird, "left");
+    
+        } else { 
+            // Standby
+            playAnimation(bird, "standby");
+        }    
+    
+        // Scrolling
+        if (x < 200) {
+            x = 200, scrollStepX = -2;
+        
+        } else if (x > 600) {
+            x -= 5, scrollStepX = 2;
+        
+        } else {
+            scrollStepX = 0;
+        };     
+};
+</script>
+</body>
+</html>
