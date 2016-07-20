@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+
+	<title>Load and display Sprite</title>
+	
+	<!-- Insert EasySprite -->
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+    openScreen("game", 0, 0, 800, 600, renderGame);
+    
+    var background = loadSprite("assets/image/blur1.jpg"); 
+    
+    //Load sprite sheet with callback
+    var coin = loadSprite("assets/image/coin.png", loadOnSucces);
+    
+    function loadOnSucces() {
+        //Add animation (10 frames, frame width: 100, frame height: 100, frame rate: 50)
+        if (isSprite(coin) === true) {
+            addAnimation(coin, "animcoin", [0,1,2,3,4,5,6,7,8,9], 100, 100, 50);
+        }
+    }
+    
+    //Update screen 
+    function renderGame() {
+        displaySprite(background, 0, 0, screenWidth(), screenHeight());
+        
+        // Display sprite and anime
+        displaySprite(coin, 350, 250);
+        playAnimation(coin, "animcoin");
+    };
+</script>
+</body>
+</html>
