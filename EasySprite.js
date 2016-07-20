@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.7.0
+ * Version 	: 1.7.1
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 18 Juillet 2016
+ * Update 	: 21 Juillet 2016
  */
 (function(){
 	"use strict";
@@ -100,7 +100,7 @@
 		// Render game loop	
 		if (callBack != void 0) {
 			if (refreshRate !== undefined) { game.refreshRate = refreshRate };
-			setInterval(callBack, refreshRate);
+			setInterval(callBack, game.refreshRate);
 		};		
 		return game;
 	}
