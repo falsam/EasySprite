@@ -1,7 +1,7 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.7.1
+ * Version 	: 1.7.2
  *
  * Released under The MIT License (MIT)
  *
@@ -40,7 +40,7 @@
 		context = canvas.getContext("2d");
 		context.fillStyle = color;
 		context.fillRect(0, 0, width, height);
-
+		
 		image = document.createElement("img");
 		image.style.display = "none";
 		image.src = canvas.toDataURL("image/png");
@@ -169,13 +169,15 @@
 		this.clip = [];
 		this.clip.x = 0;
 		this.clip.y = 0;
-		this.clip.frame = 1,
-		this.clip.speed = 0,
+		this.clip.width = 0;
+		this.clip.height = 0;
+		this.clip.frame = 1;
+		this.clip.speed = 0;
 		
 		//Flip
 		this.flip = [];
-		this.flip.h = 1; // No flip (-1 flip)
-		this.flip.v = 1; // no flip (-1 flip)
+		this.flip.h = 1; // No flip (-1 flip horizontal)
+		this.flip.v = 1; // no flip (-1 flip vertical)
 		
 		//Scale
 		this.scale = [];
@@ -415,7 +417,7 @@
 		}
 				
 		for (sx = 0; sx < 2; sx++) {
-			for (sy = 0; sy < 2; sy++) {
+			for (sy = 0; sy < 1; sy++) {
 				displaySprite(sprite, x + spriteWidth * sx - sprite.PositionX, y + spriteHeight * sy - sprite.PositionY, width, height);
 			}
 		}
