@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.7.2
+ * Version 	: 1.8.1
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 21 Juillet 2016
+ * Update 	: 31 Juillet 2016
  */
 (function(){
 	"use strict";
@@ -730,6 +730,10 @@
 	function randomFloat(min, max) {
 		return Math.random() * (max - min) + min;
 	}
+	
+	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+								   window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+
 	
 	window.KEY_BACKSPACE = 8;
 	window.KEY_TAB = 9;
