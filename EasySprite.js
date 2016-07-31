@@ -1,7 +1,7 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.1
+ * Version 	: 1.8.2
  *
  * Released under The MIT License (MIT)
  *
@@ -143,7 +143,7 @@
 		game.width = width;
 		game.height = height;
 	
-		window.addEventListener('resize', ResizeScreen, false);
+		window.addEventListener('resize', resizeScreen, false);
 	};
 	
 	// SPRITE FEATURE	
@@ -318,6 +318,7 @@
 	function displaySprite(sprite, x, y, width, height) {
 		if (x === void 0) { x = sprite.x + sprite.velocity.x; }
 		if (y === void 0) { y = sprite.y + sprite.velocity.y; }	
+		
 		if (width !== void 0) { sprite.scale.width = width;}
 		if (height !== void 0) { sprite.scale.height = height; }
 		
