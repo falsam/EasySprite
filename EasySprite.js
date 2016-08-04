@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.2
+ * Version 	: 1.8.5
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 31 Juillet 2016
+ * Update 	: 04 Aout 2016
  */
 (function(){
 	"use strict";
@@ -122,7 +122,12 @@
 	}
 
 	// Screen - Resize Screen
-	function resizeScreen() {
+	function centerScreen() {
+		var canvas = document.getElementById(game.canvas);
+		canvas.style = "display: block; margin: 0 auto;";
+	}
+	
+	function resizeScreen(center) {
 		var canvas = document.getElementById(game.canvas);
 		var canvasRatio = canvas.height / canvas.width;
 		var windowRatio = window.innerHeight / window.innerWidth;
@@ -130,21 +135,26 @@
 		var height;
 
 		if (windowRatio < canvasRatio) {
-			height = window.innerHeight;
-			width = height / canvasRatio;
+		    height = window.innerHeight;
+		    width = height / canvasRatio;
 		} else {
-			width = window.innerWidth;
-			height = width * canvasRatio;
+		    width = window.innerWidth;
+		    height = width * canvasRatio;
 		}
+
 		canvas.style.width = width + 'px';
 		canvas.style.height = height + 'px';
-	
-		// Mise à jour des caractéristique du canvas
-		game.width = width;
-		game.height = height;
-	
+   
+		if (center == true) {
+		    var style = canvas.style;
+		    style.marginLeft = "auto";
+		    style.marginRight = "auto";
+		    var parentStyle = canvas.parentElement.style;
+		    parentStyle.textAlign = "center";
+		    parentStyle.width = "100%";
+		}
 		window.addEventListener('resize', resizeScreen, false);
-	};
+	}
 	
 	// SPRITE FEATURE	
 	function Sprite() {
@@ -372,10 +382,10 @@
 
 	// sprite - Collision
 	function spriteCollision(sprite1, sprite2) {
-		if (sprite1.x - sprite1.width * sprite1.anchor.x < sprite2.x + sprite2.width - sprite2.width * sprite2.anchor.x &&
-			sprite1.x + sprite1.width - sprite1.width * sprite1.anchor.x > sprite2.x - sprite2.width * sprite2.anchor.x &&
-			sprite1.y - sprite1.height * sprite1.anchor.y < sprite2.y + sprite2.height - sprite2.height * sprite2.anchor.y&&
-			sprite1.height + sprite1.y - sprite1.height * sprite1.anchor.y > sprite2.y - sprite2.height * sprite2.anchor.y ) {
+		if (sprite1.x - sprite1.clip.width * sprite1.anchor.x < sprite2.x + sprite2.clip.width - sprite2.clip.width * sprite2.anchor.x &&
+			sprite1.x + sprite1.clip.width - sprite1.clip.width * sprite1.anchor.x > sprite2.x - sprite2.clip.width * sprite2.anchor.x &&
+			sprite1.y - sprite1.clip.height * sprite1.anchor.y < sprite2.y + sprite2.clip.height - sprite2.clip.height * sprite2.anchor.y&&
+			sprite1.clip.height + sprite1.y - sprite1.clip.height * sprite1.anchor.y > sprite2.y - sprite2.clip.height * sprite2.anchor.y ) {
 		
 			return true;
 		}
@@ -574,6 +584,12 @@
 		Sound.pause();
 	}
 
+	// Sound - Pause sound
+	function resumeSound(Sound) {
+		Sound.stop().play();
+	}
+
+	
 	// Sound - Get duration
 	function soundLength(Sound) {
 		return Sound.duration();
@@ -644,20 +660,29 @@
 			displayText("InitKeyboard() is not call", 10, 20, "system", 20, "rgba(255, 0, 0, 255)");
 		}
 	}
+		
+	// Mouse - Init mouse event (insert after OpenScreen ) 
+	function getMousePos(canvas, evt) {
+		var rect = canvas.getBoundingClientRect();
+		return {
+			x: evt.clientX - rect.left,
+			y: evt.clientY - rect.top
+		};
+	}
 
-	// Mouse - Init mouse event (Place after OpenScreen ) 
 	function initMouse() {
 		var Selector = document.getElementById(game.canvas);
 	
 		Selector.addEventListener("click", function(event) {
 			game.mouseX = event.clientX;
 			game.mouseY = event.clientY;
-			gamemousebutton = event.button + 1;	
+			game.mousebutton = true;
 		});
 	
 		Selector.addEventListener("mousemove", function(event) {
-			game.mouseX = event.clientX;
-			game.mouseY = event.clientY;		
+			var mousePos = getMousePos(Selector, event);
+			game.mouseX = mousePos.x;
+			game.mouseY = mousePos.y;	
 		});
 	
 		Selector.addEventListener("mouseout", function() {
@@ -686,8 +711,9 @@
 		if ( game.mouseX === -1 ) {
 			Result = -1;
 		} else {
-			Result = game.mouseX - game.x;
+			Result = game.mouseX;// - game.x;
 		}
+
 		return Result;
 	}
 
@@ -697,7 +723,7 @@
 		if ( game.mouseY === -1 ) {
 			Result = -1;
 		} else {
-			Result = game.mouseY - game.y;
+			Result = game.mouseY;// - game.y;
 		}
 		return Result;
 	}
@@ -725,6 +751,7 @@
 
 	// Random (ça peut être utile)
 	function random(min, max) {
+		max++;
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
 
@@ -745,6 +772,7 @@
 	window.KEY_PAUSE = 19;
 	window.KEY_CAPSLOCK = 20;
 	window.KEY_ESCAPE = 27;
+	window.KEY_SPACE = 32;	
 	window.KEY_PAGEUP = 33;
 	window.KEY_PAGEDOWN = 34;
 	window.KEY_END = 35;
@@ -830,7 +858,8 @@
 	window.openScreen = openScreen;
 	window.clearScreen = clearScreen;
 	window.screenWidth = screenWidth;
-	window.screenHeight = screenHeight;    
+	window.screenHeight = screenHeight; 
+	window.centerScreen = centerScreen;
 	window.resizeScreen = resizeScreen;
 	window.debugScreen = debugScreen;
 
@@ -862,6 +891,7 @@
 	window.loadSound = loadSound;
 	window.pauseSound = pauseSound;
 	window.playSound = playSound;
+	window.resumeSound = resumeSound;
 	window.soundLength = soundLength;
 	window.soundVolume = soundVolume;
 	window.soundPosition = soundPosition;
