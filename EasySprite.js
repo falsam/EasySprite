@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.5
+ * Version 	: 1.8.6
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 04 Aout 2016
+ * Update 	: 05 Aout 2016
  */
 (function(){
 	"use strict";
@@ -162,7 +162,8 @@
 		this.x = 0;
 		this.y = 0;	
 		this.width = 0;
-		this.height =0;
+		this.height = 0;
+		this.remove = false;
 		
 		//Anchor
 		this.anchor = [];
@@ -339,8 +340,8 @@
 		if (sprite.scale.height === undefined) {
 			sprite.scale.height = sprite.height;
 		}
-	
-		// Mise à jour des coordonnées et dimension du sprite
+		
+		sprite.remove = false;
 		sprite.x = x;
 		sprite.y = y;
 
@@ -378,16 +379,23 @@
 		);
 		
 		game.context.restore();
-}
-
+	}
+	
+	// Sprite - Remove from scene
+	function removeSprite(sprite) {
+		sprite.remove = true;
+	}
+		
 	// sprite - Collision
 	function spriteCollision(sprite1, sprite2) {
-		if (sprite1.x - sprite1.clip.width * sprite1.anchor.x < sprite2.x + sprite2.clip.width - sprite2.clip.width * sprite2.anchor.x &&
-			sprite1.x + sprite1.clip.width - sprite1.clip.width * sprite1.anchor.x > sprite2.x - sprite2.clip.width * sprite2.anchor.x &&
-			sprite1.y - sprite1.clip.height * sprite1.anchor.y < sprite2.y + sprite2.clip.height - sprite2.clip.height * sprite2.anchor.y&&
-			sprite1.clip.height + sprite1.y - sprite1.clip.height * sprite1.anchor.y > sprite2.y - sprite2.clip.height * sprite2.anchor.y ) {
+		if (sprite1.remove == false && sprite2.remove == false) {
+			if (sprite1.x - sprite1.clip.width * sprite1.anchor.x < sprite2.x + sprite2.clip.width - sprite2.clip.width * sprite2.anchor.x &&
+				sprite1.x + sprite1.clip.width - sprite1.clip.width * sprite1.anchor.x > sprite2.x - sprite2.clip.width * sprite2.anchor.x &&
+				sprite1.y - sprite1.clip.height * sprite1.anchor.y < sprite2.y + sprite2.clip.height - sprite2.clip.height * sprite2.anchor.y&&
+				sprite1.clip.height + sprite1.y - sprite1.clip.height * sprite1.anchor.y > sprite2.y - sprite2.clip.height * sprite2.anchor.y ) {
 		
-			return true;
+				return true;
+			}
 		}
 	}
 	
@@ -880,6 +888,7 @@
 	window.spriteWidth = spriteWidth;
 	window.spriteHeight = spriteHeight;
 	window.isSprite = isSprite;
+	window.removeSprite = removeSprite;
 	window.debugSprite = debugSprite;
 	
 	//Animation
