@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.6
+ * Version 	: 1.8.8
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 05 Aout 2016
+ * Update 	: 06 Aout 2016
  */
 (function(){
 	"use strict";
@@ -208,7 +208,7 @@
 		this.velocity.y = 0;
 		
 		//Animation
-		this.animations = {};
+		this.animations = [];
 
 	}
 	
@@ -267,7 +267,7 @@
 	}
 
 	// Sprite - Copy sprite
-	function copySprite (sprite) {
+	function copySprite(sprite) {				
 		return Object.assign({}, sprite);
 	}
 
@@ -767,8 +767,10 @@
 		return Math.random() * (max - min) + min;
 	}
 	
-	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-								   window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+	window.requestAnimationFrame = window.requestAnimationFrame || 
+								   window.mozRequestAnimationFrame ||
+								   window.webkitRequestAnimationFrame ||
+								   window.msRequestAnimationFrame;
 
 	
 	window.KEY_BACKSPACE = 8;
