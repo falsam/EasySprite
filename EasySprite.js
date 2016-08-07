@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.8
+ * Version 	: 1.8.9
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 06 Aout 2016
+ * Update 	: 07 Aout 2016
  */
 (function(){
 	"use strict";
@@ -682,8 +682,6 @@
 		var Selector = document.getElementById(game.canvas);
 	
 		Selector.addEventListener("click", function(event) {
-			game.mouseX = event.clientX;
-			game.mouseY = event.clientY;
 			game.mousebutton = true;
 		});
 	
