@@ -678,9 +678,15 @@
 		};
 	}
 
-	function initMouse() {
+	function initMouse(hide) {
 		var Selector = document.getElementById(game.canvas);
-	
+		
+		if (hide === void 0) { hide = false; }
+		
+		if (hide == true) {
+			Selector.style.cursor = "none";
+		}
+		
 		Selector.addEventListener("click", function(event) {
 			game.mousebutton = true;
 		});
