@@ -13,7 +13,9 @@
 <body>
 
 <script>
-    openScreen("game", 0, 0, 800, 600, renderGame);
+	var loadProgress = 0;
+	
+    openScreen("game", 0, 0, 800, 600);
     
     initKeyboard();
 
@@ -22,17 +24,19 @@
     var x = 400
     var y = 200
 
-    var background = loadSprite("assets/image/background0.jpg");
-    var ground = loadSprite("assets/image/ground.jpg");
+    var background = loadSprite("assets/image/background0.jpg", onLoadSuccess);
+    var ground = loadSprite("assets/image/ground.jpg", onLoadSuccess);
     var bird = loadSprite("assets/image/bird.png", onLoadSuccess)
 
     function onLoadSuccess() {                
-        if (isSprite(bird) === true) {
+		loadProgress ++;
+        if (loadProgress == 3) {
             anchorSprite(bird, 0.5, 0.5);
 
             addAnimation(bird, "left", [0,1,2,3], 64, 64, 150);
             addAnimation(bird, "right", [4,5,6,7], 64, 64, 90);
             addAnimation(bird, "standby", [12,13,14,15], 64, 64, 90);
+			renderGame();
         }
     }
     
@@ -68,6 +72,8 @@
         } else {
             scrollStepX = 0;
         };     
+		
+		requestAnimationFrame(renderGame);
 };
 </script>
 </body>

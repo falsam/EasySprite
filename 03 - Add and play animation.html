@@ -13,17 +13,22 @@
 <body>
 
 <script>
-    openScreen("game", 0, 0, 800, 600, renderGame);
+	var loadProgress = 0;
+	
+    openScreen("game", 0, 0, 800, 600);
     
-    var background = loadSprite("assets/image/blur1.jpg"); 
+    var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess); 
     
     //Load sprite sheet with callback
-    var coin = loadSprite("assets/image/coin.png", loadOnSucces);
+    var coin = loadSprite("assets/image/coin.png", onLoadSuccess);
     
-    function loadOnSucces() {
-        //Add animation (10 frames, frame width: 100, frame height: 100, frame rate: 50)
-        if (isSprite(coin) === true) {
-            addAnimation(coin, "animcoin", [0,1,2,3,4,5,6,7,8,9], 100, 100, 50);
+    function onLoadSuccess() {
+		loadProgress ++;
+		
+		if (loadProgress == 2) {
+			//Add animation (10 frames, frame width: 100, frame height: 100, frame rate: 50)
+			addAnimation(coin, "animcoin", [0,1,2,3,4,5,6,7,8,9], 100, 100, 50);
+			renderGame();
         }
     }
     
@@ -34,6 +39,8 @@
         // Display sprite and anime
         displaySprite(coin, 350, 250);
         playAnimation(coin, "animcoin");
+		
+		requestAnimationFrame(renderGame);
     };
 </script>
 </body>

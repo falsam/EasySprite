@@ -13,18 +13,29 @@
 <body>
 
 <script>
+	var loadProgress = 0;
+	
 	// Setup screen
-	openScreen("game", 0, 0, 800, 600, renderGame);	
+	openScreen("game", 0, 0, 800, 600);	
 	
-	var background = loadSprite("assets/image/blur1.jpg	");
-	var logo = loadSprite("assets/image/html5logo.png");
+	var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+	var logo = loadSprite("assets/image/html5logo.png", onLoadSuccess);
 	
-	flipSprite(logo, -1, 1);
+	function onLoadSuccess() {
+		loadProgress ++;
+		
+		if (loadProgress == 2) {
+			flipSprite(logo, -1, 1);
+			renderGame();
+		}
+	}
 	
 	// Render screen
 	function renderGame() {
 		displaySprite(background, 0, 0, 800, 600);
-		displaySprite(logo, 500, 150);
+		displaySprite(logo, 550, 150);
+		
+		requestAnimationFrame(renderGame);
 	};
 </script>
 </body>

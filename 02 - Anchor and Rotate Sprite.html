@@ -13,12 +13,22 @@
 <body>
 
 <script>
-	// Setup screen
-	openScreen("game", 0, 0, 800, 600, renderGame);	
+	var loadProgress = 0;
 	
-	var background = loadSprite("assets/image/blur1.jpg	");
-	var logo = loadSprite("assets/image/html5logo.png");
-	anchorSprite(logo, 0.5, 0.5);
+	// Setup screen
+	openScreen("game", 0, 0, 800, 600);	
+	
+	var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+	var logo = loadSprite("assets/image/html5logo.png", onLoadSuccess);
+	
+	function onLoadSuccess() {
+		loadProgress ++;
+		if (loadProgress == 2) {
+			anchorSprite(logo, 0.5, 0.5);
+			renderGame();
+		}
+	}
+	
 	// Render screen
 	function renderGame() {
 		displaySprite(background, 0, 0, 800, 600);
@@ -26,6 +36,8 @@
 		
 		//Rotate Sprite (Relatif)
 		rotateSprite(logo, 0.2, true);
+		
+		requestAnimationFrame(renderGame);
 	};
 </script>
 </body>
