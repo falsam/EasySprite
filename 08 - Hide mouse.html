@@ -20,21 +20,24 @@
 	<canvas id='game'></canvas>
 	
 	<script>
-	var ball = loadSprite("assets/image/ball.png")
-	anchorSprite(ball, 0.5, 0.5);
-
 	openScreen("game", 0, 0, 800, 600);
 	
 	// Init mouse : option true hide mouse. 
 	initMouse(true);
-	renderGame()
-
+		
+	var ball = loadSprite("assets/image/ball.png", onLoadSuccess)
+	
+	function onLoadSuccess() {
+		anchorSprite(ball, 0.5, 0.5);
+		renderGame()
+	}
+	
 	function renderGame() {
 		var x = mouseX();
 		var y = mouseY();
 	
 		clearScreen("green");
-		
+		console.log (x + " " + y)
 		if (x + y >=0) { 
 			displaySprite(ball, x, y)
 		} else {
