@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 1.8.9
+ * Version 	: 2.0.0
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 07 Aout 2016
+ * Update 	: 12 Aout 2016
  */
 (function(){
 	"use strict";
@@ -17,14 +17,14 @@
 	game.canvas = "game";
 	game.initkeyboard = false; 
 	game.initmouse = false;
-	game.key = {};
-	game.TO_RADIANS = Math.PI/180;
-	
-	game.refreshRate = 40;
+	game.mousehide = false;
+	game.TO_RADIANS = Math.PI/180;	
 	game.lastCalledTime = 0;
 	game.fps = 0;
 	game.fpsCount = 0;
-
+	game.inputs = []
+	game.key = {};
+	
 	function loadFailure() {
 		alert("'" + this.name + "' failed to load.");
 		return true;
@@ -44,7 +44,6 @@
 		image = document.createElement("img");
 		image.style.display = "none";
 		image.src = canvas.toDataURL("image/png");
-		document.body.appendChild(image);
 
 		return [image, context, canvas];
 	}
@@ -64,11 +63,12 @@
 	// SCREEN FEATURE
 	
 	// Screen - Create and open new screen.
-	function openScreen(id, x, y, width, height, callBack, refreshRate) {
+	function openScreen(id, x, y, width, height) {
 		var selector = document.getElementById(id);	
 		
+		// is canvas exist ?
 		if (selector === null) {
-			// Create Canvas Rendering		
+			// No : Create Canvas Rendering		
 			selector = document.createElement("canvas");
 			selector.id = id;
 	
@@ -81,7 +81,7 @@
 			document.body.appendChild(selector);
 		} else {
 			
-			//Canvas exist
+			// Yes : Canvas exist
 			if (width === 0) {width = selector.width};
 			if (height === 0) {height = selector.height};
 			
@@ -89,7 +89,7 @@
 			selector.height = height;			
 		}
 		
-		// Mémorisation de la configuration du canvas
+		// Record canvas setup
 		game.canvas = id;
 		game.x = x;
 		game.y = y;
@@ -97,11 +97,6 @@
 		game.height = height;
 		game.context = selector.getContext('2d');
 	
-		// Render game loop	
-		if (callBack != void 0) {
-			if (refreshRate !== undefined) { game.refreshRate = refreshRate };
-			setInterval(callBack, game.refreshRate);
-		};		
 		return game;
 	}
 	
@@ -112,21 +107,18 @@
 	}
 
 	// Screen - Returns the current screen width.
-	function screenWidth() {
-		return game.width;
-	}
+	function screenWidth() { return game.width; }
 
 	// Screen - Returns the current screen height.
-	function screenHeight() {
-		return game.height;
-	}
+	function screenHeight() { return game.height; }
 
-	// Screen - Resize Screen
+	// Screen - Center Screen (Disable)
 	function centerScreen() {
 		var canvas = document.getElementById(game.canvas);
 		canvas.style = "display: block; margin: 0 auto;";
 	}
 	
+	// resizeScreen
 	function resizeScreen(center) {
 		var canvas = document.getElementById(game.canvas);
 		var canvasRatio = canvas.height / canvas.width;
@@ -161,6 +153,7 @@
 		//Position & size
 		this.x = 0;
 		this.y = 0;	
+		this.z = 0;
 		this.width = 0;
 		this.height = 0;
 		this.remove = false;
@@ -196,8 +189,11 @@
 		this.scale.height = 0;
 		
 		//Scroll
-		this.PositionX = 0;
-		this.PositionY = 0;	
+		this.scroll = [];
+		this.scroll.x = 0;
+		this.scroll.y = 0
+		this.scroll.PositionX = 0;
+		this.scroll.PositionY = 0;	
 		
 		//Opacity
 		this.opacity = 1.0;
@@ -209,19 +205,26 @@
 		
 		//Animation
 		this.animations = [];
-
+		
+		this.load = false;
+		
+		//Data
+		this.data = 0;
+		this.n = 0;
+		
+		//Callbak Events
+		this.onClick = false;
 	}
 	
-	function createSprite(width, height, color) {
+	// Create Sprite
+	function createSprite(width, height, color, onReady, onClick) {
 		var sprite = new Sprite();
-		
-		if (color === void 0) { color = "rgba(255, 255, 255, 0)"; }
-		
-		var Result = createImage(width, height, color);
+				
+		var result = createImage(width, height, color);
 						
-		sprite.image = Result[0];
-		sprite.context = Result[1];
-		sprite.canvas = Result[2];
+		sprite.image = result[0];
+		sprite.context = result[1];
+		sprite.canvas = result[2];
 		
 		sprite.width = width;		
 		sprite.height = height;
@@ -233,36 +236,52 @@
 		// Scale
 		sprite.scale.width = sprite.width;
 		sprite.scale.height = sprite.height;
-			
+		
+		if (onReady != false) {
+			onReady(sprite);
+		};	
+		
+		if (onClick != false) {
+			game.inputs[game.inputs.length] = sprite
+			sprite.onClick = onClick;
+		};
+		
 		return sprite;
 	}
 
+	
 	// Sprite - Load sprite
-	function loadSprite(fileName, callBack) {
-		if (callBack === void 0) { callBack = false; }
+	function loadSprite(fileName, onReady, OnClick) {
+		if (onReady === void 0) { onReady = false; }
+		if (OnClick === void 0) { OnClick = false; }
 		
 		var image = new Image();
 		var sprite = new Sprite();
 		
-		sprite.image = image;
-			
-		function getWidthAndHeight() 	{
-			sprite.clip.width = this.width;
-			sprite.clip.height = this.height; 
-			sprite.width = this.width;
-			sprite.height = this.height;
-			sprite.scale.width = this.width;
-			sprite.scale.height = this.height;
-			
-			if (callBack != false) {
-				callBack(sprite);
-			};
+		function getWidthAndHeight(){
+			if (sprite.load == false) {
+				sprite.clip.width = this.width;
+				sprite.clip.height = this.height; 
+				sprite.width = this.width;
+				sprite.height = this.height;
+				sprite.scale.width = this.width;
+				sprite.scale.height = this.height;
+				if (onReady != false) {
+					onReady(sprite);
+				};
+
+				if (OnClick != false) {
+					game.inputs[game.inputs.length] = sprite
+					sprite.onClick = OnClick;
+				};	
+			}
 		} 		
 		
 		image.onload = getWidthAndHeight;
 		image.onerror = loadFailure;
 		image.name = fileName;
 		image.src = fileName;	
+		sprite.image = image;
 		return sprite;	
 	}
 
@@ -281,7 +300,9 @@
 		sprite.clip.x = x;
 		sprite.clip.y = y;
 		sprite.clip.width = width;
-		sprite.clip.height = height;	
+		sprite.clip.height = height;
+		sprite.scale.width = width;
+		sprite.scale.height = height;
 	}
 
 	// Sprite - Rotation  (Angle en degré)
@@ -295,6 +316,12 @@
 		}	
 	}
 	
+	// Sprite - Scale 
+	function scaleSprite(sprite, width, height) {
+		sprite.scale.width = width;
+		sprite.scale.height = height;
+	}
+	
 	// Sprite - Set velocity
 	function spriteVelocity(sprite, x, y) {
 		if (y === void 0) { y = 0; }
@@ -304,11 +331,11 @@
 	}
 	
 	// sprite - Flip (-1 flip)
-	function flipSprite (sprite, FlipH, FlipV) {
-		if (FlipV === void 0) { FlipV = 1; }
+	function flipSprite (sprite, flipH, flipV) {
+		if (flipV === void 0) { flipV = 1; }
 	
-		sprite.flip.h = FlipH;
-		sprite.flip.v = FlipV;
+		sprite.flip.h = flipH;
+		sprite.flip.v = flipV;
 	}
 
 	// Sprite - Anchor
@@ -372,8 +399,8 @@
 			sprite.clip.height,
 		
 			//Destination)
-			- sprite.clip.width * sprite.anchor.x, 	// Position x
-			- sprite.clip.height * sprite.anchor.y,	// Position y
+			- sprite.scale.width * sprite.anchor.x, 	// Position x
+			- sprite.scale.height * sprite.anchor.y,	// Position y
 			sprite.scale.width,
 			sprite.scale.height
 		);
@@ -381,12 +408,12 @@
 		game.context.restore();
 	}
 	
-	// Sprite - Remove from scene
+	// Sprite - Remove from screen
 	function removeSprite(sprite) {
 		sprite.remove = true;
 	}
 		
-	// sprite - Collision
+	// Sprite - Collision between two sprites
 	function spriteCollision(sprite1, sprite2) {
 		if (sprite1.remove == false && sprite2.remove == false) {
 			if (sprite1.x - sprite1.clip.width * sprite1.anchor.x < sprite2.x + sprite2.clip.width - sprite2.clip.width * sprite2.anchor.x &&
@@ -399,6 +426,7 @@
 		}
 	}
 	
+	// Sprite - is sprite exist ?
 	function isSprite(sprite) {
 		if (typeof sprite === "object") {
 			return true;
@@ -407,7 +435,7 @@
 		}
 	}
 	
-	// sprite - Scroll 
+	// Sprite - Scroll 
 	function scrollSprite(sprite, x, y, stepX, stepY, width, height) {
 		var spriteWidth  = width; 
 		var spriteHeight = height; 
@@ -416,45 +444,58 @@
 		if (width === void(0)) {width = sprite.scale.width};
 		if (height === void(0)) {height = sprite.scale.height};
 		
-		sprite.PositionX += stepX;
-		sprite.PositionY += stepY;
+		sprite.scroll.PositionX += stepX;
+		sprite.scroll.PositionY += stepY;
 		
-		if (sprite.PositionX > spriteWidth) {
-			sprite.PositionX = 0;
+		if (sprite.scroll.PositionX > spriteWidth) {
+			sprite.scroll.PositionX = 0;
 		}
   
-		if (sprite.PositionX < 0) {
-			sprite.PositionX = spriteWidth;
+		if (sprite.scroll.PositionX < 0) {
+			sprite.scroll.PositionX = spriteWidth;
 		}
   
-		if (sprite.PositionY > spriteHeight) {
-			sprite.PositionY = 0;
+		if (sprite.scroll.PositionY > spriteHeight) {
+			sprite.scroll.PositionY = 0;
 		}
   
-		if (sprite.PositionY < 0) {
-			sprite.PositionY = spriteHeight;
+		if (sprite.scroll.PositionY < 0) {
+			sprite.scroll.PositionY = spriteHeight;
 		}
 				
 		for (sx = 0; sx < 2; sx++) {
 			for (sy = 0; sy < 1; sy++) {
-				displaySprite(sprite, x + spriteWidth * sx - sprite.PositionX, y + spriteHeight * sy - sprite.PositionY, width, height);
+				displaySprite(sprite, x + spriteWidth * sx - sprite.scroll.PositionX, y + spriteHeight * sy - sprite.scroll.PositionY, width, height);
 			}
 		}
 	}
 
-	//sprite - Return sprite width 
-	function spriteWidth(sprite) {
-		return sprite.width;
+	// Sprite - Return sprite width 
+	function spriteWidth(sprite) { return sprite.width; }
+
+	// Sprite - Return sprite height
+	function spriteHeight(sprite) { return sprite.height; }
+
+	// Sprite - Start drawing
+	function startDrawing(sprite) {
+		var context;
+		
+		game.currentsprite = sprite;
+		
+		game.currentdraw = document.createElement("canvas");
+		game.currentdraw.id = "temp";
+		game.currentdraw.width = sprite.width;
+		game.currentdraw.height = sprite.height;
+		context = game.currentdraw.getContext("2d");
+		context.drawImage(sprite.image, 0, 0);
+
+		return context;
 	}
-
-	//sprite - Return sprite height
-	function spriteHeight(sprite) {
-		return sprite.height;
-	}
-
-
-	function StartDrawing(sprite) {
-	
+		
+	// Sprite - Stop drawing
+	function stopDrawing() {
+		game.currentsprite.load = true;
+		game.currentsprite.image.src = game.currentdraw.toDataURL("image/png");	
 	}
 	
 	// ANIMATION FEATURE
@@ -523,6 +564,10 @@
 	
 	// Text - Display text
 	function displayText(text, x, y, font, size, color) {
+		if (font === void 0) { font = "Arial"; }	
+		if (size === void 0) { size = 20; }
+		if (color === void 0) { color = "red"; }
+		
 		game.context.font = size.toString() + "px " + font;
 		game.context.fillStyle = color;
 		game.context.fillText(text, x, y);	
@@ -561,7 +606,6 @@
 		
 		displayText("x/y: " + game.x + "/" + game.y, x, y, police, size, color);
 		displayText("width/height: " + game.width + "/" + game.height, x, y += 25, police, size, color);
-		displayText("frameRate: " + game.refreshRate, x, y += 25, police, size, color);
 
 		
 	}
@@ -670,31 +714,56 @@
 	}
 		
 	// Mouse - Init mouse event (insert after OpenScreen ) 
-	function getMousePos(canvas, evt) {
+	function getMousePos(canvas, evt) { // private
 		var rect = canvas.getBoundingClientRect();
 		return {
 			x: evt.clientX - rect.left,
 			y: evt.clientY - rect.top
 		};
 	}
-
+	
+	function mouseCollision() { // private
+		if (game.mousehide == false) {
+		for (var n in game.inputs) {				
+			if ( mouseX() > game.inputs[n].x && mouseX() < game.inputs[n].x + game.inputs[n].scale.width &&
+				 mouseY() > game.inputs[n].y && mouseY() < game.inputs[n].y + game.inputs[n].scale.height)  {						
+				 return n;
+				 break;
+			}
+		}
+		}
+	}
+	
 	function initMouse(hide) {
-		var Selector = document.getElementById(game.canvas);
+		var Selector = document.getElementById(game.canvas), n;
 		
 		if (hide === void 0) { hide = false; }
-		
-		if (hide == true) {
+		if (hide == true || game.mousehide == true) {
+			game.mousehide = true;
 			Selector.style.cursor = "none";
 		}
 		
 		Selector.addEventListener("click", function(event) {
 			game.mousebutton = true;
+			
+			var n = mouseCollision()
+			if (n && game.mousehide == false) {
+				game.inputs[n].onClick(game.inputs[n])
+			}
 		});
 	
 		Selector.addEventListener("mousemove", function(event) {
 			var mousePos = getMousePos(Selector, event);
 			game.mouseX = mousePos.x;
-			game.mouseY = mousePos.y;	
+			game.mouseY = mousePos.y;
+			
+			if (game.mousehide == false) {
+				if (mouseCollision()) {
+					Selector.style.cursor = "pointer";
+				} else {
+					Selector.style.cursor = "auto";				
+				}
+			}
 		});
 	
 		Selector.addEventListener("mouseout", function() {
@@ -771,12 +840,19 @@
 		return Math.random() * (max - min) + min;
 	}
 	
+	//Pads a string to the right by adding extra characters to fit the specified length. 
+	function rPad(n, width, z) {
+		z = z || '0';
+		n = n + '';
+		return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+	}
+	
 	window.requestAnimationFrame = window.requestAnimationFrame || 
 								   window.mozRequestAnimationFrame ||
 								   window.webkitRequestAnimationFrame ||
 								   window.msRequestAnimationFrame;
 
-	
+	// Define keyboard
 	window.KEY_BACKSPACE = 8;
 	window.KEY_TAB = 9;
 	window.KEY_ENTER = 13;
@@ -864,6 +940,8 @@
 	window.KEY_F11 = 122;
 	window.KEY_F12 = 123;
 	window.KEY_NUMLOCK = 144;	
+		
+	// Declare functions
 	
 	//FPS
 	window.FPS = FPS;
@@ -877,11 +955,13 @@
 	window.resizeScreen = resizeScreen;
 	window.debugScreen = debugScreen;
 
+	
 	//Sprite
 	window.createSprite = createSprite;
 	window.loadSprite = loadSprite;
 	window.anchorSprite = anchorSprite;
 	window.clipSprite = clipSprite;
+	window.scaleSprite = scaleSprite;
 	window.copySprite = copySprite;
 	window.spritePosition = spritePosition;
 	window.spriteVelocity = spriteVelocity;
@@ -896,7 +976,9 @@
 	window.isSprite = isSprite;
 	window.removeSprite = removeSprite;
 	window.debugSprite = debugSprite;
-	
+	window.startDrawing = startDrawing;
+	window.stopDrawing = stopDrawing;
+
 	//Animation
 	window.addAnimation = addAnimation;
 	window.animationActive = animationActive;
@@ -935,6 +1017,7 @@
 	//Misc	
 	window.random = random;
 	window.randomFloat = randomFloat;
+	window.rPad = rPad;
 })();
 
 // Sound use howler.js
