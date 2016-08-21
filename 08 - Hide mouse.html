@@ -20,6 +20,8 @@
 	<canvas id='game'></canvas>
 	
 	<script>
+	var countClic = 0;
+	
 	openScreen("game", 0, 0, 800, 600);
 	
 	// Init mouse : option true hide mouse. 
@@ -37,7 +39,7 @@
 		var y = mouseY();
 	
 		clearScreen("green");
-		console.log (x + " " + y)
+
 		if (x + y >=0) { 
 			displaySprite(ball, x, y)
 		} else {
@@ -46,6 +48,12 @@
 	
 		displayText("x/y " + x + " / " + y, 40, 40, "Arial", 25, "white");
 	
+		displayText("mouseState() " + mouseState(), 40, 80, "Arial", 25, "white");
+
+		displayText("Count Clicks " + countClic, 40, 120, "Arial", 25, "white");
+		
+		if (mouseButton() == true) {countClic ++};
+
 		requestAnimationFrame(renderGame);
 	}
 	</script>
