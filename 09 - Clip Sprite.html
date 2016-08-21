@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1, IE=9">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+	<title>ClipSprite</title>	
+	<script src="easysprite.js"></script>
+	
+	<style>
+		#game {  display: block; margin: 0 auto;}
+		body { background: #333; }
+	</style>
+</head>
+<body>
+	<canvas id='game'></canvas>
+	<script>
+	var loadProgress = 0;
+	var scene;
+	openScreen("game", 0, 0, 800, 600);
+	initMouse();
+	
+	// Background
+	var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+	var layer1 = loadSprite("assets/image/bluemountain.png", onLoadSuccess);
+	var layer2 = loadSprite("assets/image/evenground_platform_long.png", onLoadSuccess)
+	
+	// Tree and bush
+	var tree0 = loadSprite("assets/image/trees.png", onLoadSuccess);
+	var tree1 = loadSprite("assets/image/trees.png", onLoadSuccess);
+	var bush0 = loadSprite("assets/image/trees.png", onLoadSuccess);
+	var bush1 = loadSprite("assets/image/trees.png", onLoadSuccess);
+	
+	function onLoadSuccess() {
+		loadProgress ++;
+		if (loadProgress == 7) {
+			
+			//Create landscape
+			clipSprite(tree0, 0, 99, 65, 158);
+			clipSprite(tree1, 132, 18, 55, 93);
+			clipSprite(bush0, 68, 8, 63, 50);
+			clipSprite(bush1, 25, 20, 39, 33);
+			renderGame();
+		}
+	}
+	
+	function onClick(sprite) {
+		alert("clicl")
+	}
+	
+	function renderGame() {
+		clearScreen("black");
+		displaySprite(background, 0, 0, 800, 600);
+		displaySprite(layer1, 0, 200);
+		displaySprite(layer2, 0, 540);
+		displaySprite(tree0, 200, 410);
+		displaySprite(tree0, 360, 410);
+		displaySprite(tree1, 250, 470);
+		displaySprite(tree1, 300, 490);
+		displaySprite(bush0, 320, 550);
+		displaySprite(bush1, 220, 550);		
+		displaySprite(bush1, 250, 560);		
+		requestAnimationFrame(renderGame);
+	}
+	
+	</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+	<title>Sprite collision</title>
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+	var loadProgress = 0;
+	
+	openScreen("game", 0, 0, 800, 600);	
+	
+	var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+	var ground = loadSprite("assets/image/ground.jpg", onLoadSuccess);
+	var ball = loadSprite("assets/image/ball.png", onLoadSuccess);
+	
+	function onLoadSuccess() {
+		loadProgress ++;
+	
+		if (loadProgress == 3) {
+			spritePosition(ball, 100, 100);
+			renderGame();
+		}
+	}
+	
+	function renderGame() {
+		displaySprite(background, 0, 0, 800, 600);
+		displaySprite(ground, 0, 550);
+		displaySprite(ball, ball.x, ball.y);
+		
+		if (! spriteCollision(ball, ground)) {
+			ball.x += 1;
+			ball.y += 3;
+		}
+		requestAnimationFrame(renderGame);
+	};
+</script>
+</body>
+</html>

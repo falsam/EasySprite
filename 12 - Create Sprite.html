@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+	<title>Create Sprite</title>
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+	var rnd = Math.random, width, height;
+	var loadProgress = 0;
+	
+	openScreen("game", 0, 0, 800, 600);	
+	
+	var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+	
+	// Create Sprite
+	var square = createSprite(300, 200, "rgba(255, 255, 255, 1)", onLoadSuccess);
+	
+	function onLoadSuccess() {
+		loadProgress ++;
+	
+		if (loadProgress == 2) {
+			width = spriteWidth(square);
+			height = spriteHeight(square);
+			anchorSprite(square, 0.5, 0.5);
+			// Hello World
+			var ctx = startDrawing(background);
+				ctx.font = "30px Arial";
+				ctx.fillText("Create Sprite & Start drawing", 10, 50);
+			stopDrawing();	
+			
+			renderGame();
+		}
+	}
+	
+	//Random RGB
+	function rgb() {
+		return Math.floor(rnd()*256).toString();
+	}
+	
+	function renderGame() {
+		clearScreen("rgb(0, 0, 0)");
+		displaySprite(background, 0, 0, 800, 600);
+
+		var ctx = startDrawing(square);
+			//Random Rectangles
+			ctx.fillStyle = "rgb(" + rgb() + "," + rgb() + "," + rgb() + ")";
+			ctx.fillRect(width * rnd(), height * rnd(), rnd() * height/4, rnd() * width/4);		
+			
+			ctx.fillStyle = "#FF0000";
+			ctx.lineWidth = 3;
+			ctx.strokeRect(0,0,width,height);
+		stopDrawing()
+	
+		displaySprite(square, 400, 300);
+		rotateSprite(square, 0.5, true)
+		
+		requestAnimationFrame(renderGame);
+	};
+</script>
+</body>
+</html>

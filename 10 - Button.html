@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-EN">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
+	<title>Click & Play</title>
+	
+	<script src="EasySprite.js"></script>
+</head>
+<body>
+
+<script>
+var loadProgress = 0;
+
+openScreen("game", 100, 100, 400, 200);
+initMouse();
+
+var background = loadSprite("assets/image/blur1.jpg", onLoadSuccess);
+var btnPlay = loadSprite("assets/image/play.png", onLoadSuccess, onClick);
+
+var yeah = loadSound("assets/sound/yeah.mp3");
+
+function onLoadSuccess () {
+	loadProgress ++;
+	if (loadProgress == 2) {
+		renderGame();
+	}
+}
+
+function onClick(sprite) {
+	if (sprite == btnPlay) {
+		playSound(yeah);
+	}
+}
+
+function renderGame() {
+	clearScreen("green");	
+	displaySprite(background, 0, 0, 400, 200)
+	displaySprite(btnPlay, 10, 100);
+	displayText("Click and play sound", 20, 40, "Arial", 25, "White")
+	requestAnimationFrame(renderGame);
+}
+</script>
+</body>
+</html>
