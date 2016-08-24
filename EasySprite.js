@@ -1,12 +1,12 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 2.0.0
+ * Version 	: 2.0.1
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
- * Update 	: 12 Aout 2016
+ * Update 	: 24 Aout 2016
  */
 (function(){
 	"use strict";
@@ -30,24 +30,6 @@
 		return true;
 	}
  
-	// Image - Create image  - Create image
-	function createImage (width, height, color){
-		var image, canvas, context;
-	
-		canvas = document.createElement("canvas");
-		canvas.width = width;
-		canvas.height = height;
-		context = canvas.getContext("2d");
-		context.fillStyle = color;
-		context.fillRect(0, 0, width, height);
-		
-		image = document.createElement("img");
-		image.style.display = "none";
-		image.src = canvas.toDataURL("image/png");
-
-		return [image, context, canvas];
-	}
-
 	// FPS 
 	function FPS() {		
 		game.fpsCount += 1;
@@ -218,42 +200,55 @@
 	
 	// Create Sprite
 	function createSprite(width, height, color, onReady, onClick) {
+		if (onReady === void 0) { onReady = false; }
+		if (onClick === void 0) { onClick = false; }
+		
 		var sprite = new Sprite();
-				
-		var result = createImage(width, height, color);
-						
-		sprite.image = result[0];
-		sprite.context = result[1];
-		sprite.canvas = result[2];
-		
-		sprite.width = width;		
-		sprite.height = height;
-		
-		// Clip
-		sprite.clip.width = sprite.width,
-		sprite.clip.height = sprite.height,
+		var image = new Image();
+		var canvas = document.createElement("canvas");
+		var context = canvas.getContext("2d");
 			
-		// Scale
-		sprite.scale.width = sprite.width;
-		sprite.scale.height = sprite.height;
-		
-		if (onReady != false) {
-			onReady(sprite);
-		};	
-		
-		if (onClick != false) {
-			game.inputs[game.inputs.length] = sprite
-			sprite.onClick = onClick;
+		canvas.width = width;
+		canvas.height = height;
+		context.fillStyle = color;
+		context.fillRect(0, 0, width, height);
+			
+		//image = document.createElement("img");
+		//image.style.display = "none";
+		image.onload = function(){
+
+			// Size
+			sprite.width = width;		
+			sprite.height = height;
+
+			// Clip
+			sprite.clip.width = sprite.width,
+			sprite.clip.height = sprite.height,
+			
+			// Scale
+			sprite.scale.width = sprite.width;
+			sprite.scale.height = sprite.height;
+			
+			// Callback
+			if (onReady != false) {
+				onReady(sprite);
+			};	
+			if (onClick != false) {
+				game.inputs[game.inputs.length] = sprite
+				sprite.onClick = onClick;
+			};
 		};
-		
+		image.onerror = loadFailure;
+		image.src = canvas.toDataURL("image/png");
+		sprite.image = image;						
 		return sprite;
 	}
 
 	
 	// Sprite - Load sprite
-	function loadSprite(fileName, onReady, OnClick) {
+	function loadSprite(fileName, onReady, onClick) {
 		if (onReady === void 0) { onReady = false; }
-		if (OnClick === void 0) { OnClick = false; }
+		if (onClick === void 0) { onClick = false; }
 		
 		var image = new Image();
 		var sprite = new Sprite();
@@ -270,9 +265,9 @@
 					onReady(sprite);
 				};
 
-				if (OnClick != false) {
+				if (onClick != false) {
 					game.inputs[game.inputs.length] = sprite
-					sprite.onClick = OnClick;
+					sprite.onClick = onClick;
 				};	
 			}
 		} 		
@@ -714,23 +709,32 @@
 	}
 		
 	// Mouse - Init mouse event (insert after OpenScreen ) 
-	function getMousePos(canvas, evt) { // private
+	function getMousePos(canvas, evt, type) { // private
 		var rect = canvas.getBoundingClientRect();
-		return {
-			x: evt.clientX - rect.left,
-			y: evt.clientY - rect.top
-		};
+		var scale = rect.width / canvas.width;
+		
+		if (type == "mousemove") {
+			return {
+				x: (evt.clientX - rect.left)/scale,
+				y: (evt.clientY - rect.top)/scale
+			};
+		} else {
+			return {
+				x: (evt.targetTouches[0].pageX - rect.left)/scale,
+				y: (evt.targetTouches[0].pageY - rect.top)/scale
+			}
+		}
 	}
 	
 	function mouseCollision() { // private
 		if (game.mousehide == false) {
-		for (var n in game.inputs) {				
-			if ( mouseX() > game.inputs[n].x && mouseX() < game.inputs[n].x + game.inputs[n].scale.width &&
-				 mouseY() > game.inputs[n].y && mouseY() < game.inputs[n].y + game.inputs[n].scale.height)  {						
-				 return n;
-				 break;
+			for (var n in game.inputs) {				
+				if ( mouseX() > game.inputs[n].x && mouseX() < game.inputs[n].x + game.inputs[n].scale.width &&
+					mouseY() > game.inputs[n].y && mouseY() < game.inputs[n].y + game.inputs[n].scale.height)  {						
+					return n;
+					break;
+				}
 			}
-		}
 		}
 	}
 	
@@ -753,7 +757,7 @@
 		});
 	
 		Selector.addEventListener("mousemove", function(event) {
-			var mousePos = getMousePos(Selector, event);
+			var mousePos = getMousePos(Selector, event, "mousemove");
 			game.mouseX = mousePos.x;
 			game.mouseY = mousePos.y;
 			
@@ -779,7 +783,28 @@
 		Selector.addEventListener("mouseup", function() {
 			game.mousestate = false;
 		});
-	
+		
+		// Mobile Device
+		Selector.addEventListener("touchstart", function() {
+			game.mousebutton = false;
+			game.mousestate = true;
+		});
+
+		Selector.addEventListener("touchend", function() {
+			game.mousestate = false;
+		});
+
+		Selector.addEventListener("touchmove", function(event) {			
+			event.preventDefault();
+			game.mousebutton = false;
+			game.mousestate = true;
+
+			var mousePos = getMousePos(Selector, event, "touchmove");
+			game.mouseX = mousePos.x;
+			game.mouseY = mousePos.y;
+			
+		}, false);
+		
 		game.mouseX = -1;
 		game.mouseY = -1;
 		game.mousebutton = false;
@@ -822,12 +847,12 @@
 	
 	// Browser - Retourne la largeur du navigateur
 	function windowWidth() {
-		return window.innerWidth;
+		return document.all?document.body.clientWidth:window.innerWidth;
 	}
 
 	// Browser - Retourne la hauteur du navigateur
 	function windowHeight() {
-		return window.innerHeight;
+		return document.all?document.body.clientHeight:window.innerHeight; 
 	}
 
 	// Random (ça peut être utile)
