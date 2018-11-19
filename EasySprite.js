@@ -1,12 +1,13 @@
  /**
  *EasySprite.js by falsam
  * 
- * Version 	: 2.0.1
+ * Version 	: 2.0.2
  *
  * Released under The MIT License (MIT)
  *
  * Create	: 01 Juin 2015
  * Update 	: 24 Aout 2016
+ * Contribution : by ducksonthewater, 19 Novembre 2018
  */
 (function(){
 	"use strict";
@@ -558,14 +559,17 @@
 	// TEXT & DEBUG FEATURE
 	
 	// Text - Display text
-	function displayText(text, x, y, font, size, color) {
+	// added by ducksonthewater, 19.11.2018: textAlign (left, right, center)
+	function displayText(text, x, y, font, size, color, textAlign) {
 		if (font === void 0) { font = "Arial"; }	
 		if (size === void 0) { size = 20; }
 		if (color === void 0) { color = "red"; }
+		if (textAlign === void 0) { textAlign = "left"; }
 		
 		game.context.font = size.toString() + "px " + font;
 		game.context.fillStyle = color;
-		game.context.fillText(text, x, y);	
+		game.context.textAlign = textAlign;
+		game.context.fillText(text, x, y);
 	}
 	
 	// Sprite - Debug Sprite
@@ -631,6 +635,12 @@
 		Sound.pause();
 	}
 
+	// Sound - Stop Sound
+	// added by ducksonthewater, 19.11.2018
+	function stopSound(Sound) {
+		Sound.stop();
+	}
+	
 	// Sound - Pause sound
 	function resumeSound(Sound) {
 		Sound.stop().play();
@@ -1013,6 +1023,7 @@
 	window.loadSound = loadSound;
 	window.pauseSound = pauseSound;
 	window.playSound = playSound;
+	window.stopSound = stopSound;	// added by ducksonthewater, 19.11.2018
 	window.resumeSound = resumeSound;
 	window.soundLength = soundLength;
 	window.soundVolume = soundVolume;
