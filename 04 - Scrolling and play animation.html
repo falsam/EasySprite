@@ -1,24 +1,24 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta charset="utf-8" />
-	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"> 
-
-	<title>Scrolling and play animation.</title>
-	
-	<!-- Insert EasySprite -->
-	<script src="EasySprite.js"></script>
-</head>
-<body>
-
-<script>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <title>Scrolling and play animation.</title>
+        <!-- Insert EasySprite -->
+        <script src="EasySprite.js"></script>
+    </head>
+    <body>
+        <script>
 	var loadProgress = 0;
 	
     openScreen("game", 0, 0, 800, 600);
     
     initKeyboard();
-
+    initGamepad();
+   
+   
+    
     var backgroundStepX = 0;
     var scrollStepX = 0;
     var x = 400
@@ -48,12 +48,14 @@
         // Display bird
         displaySprite(bird, x, y, 64, 64);    
         
+    
+         
         // Keyboard event
-        if (keyboardPushed(KEY_RIGHT)) { 
+        if (keyboardPushed(KEY_RIGHT) || keypadPushed(KEYPAD_RIGHT)) { 
             x += 5; // To the right
             playAnimation(bird, "right");
     
-        } else if (keyboardPushed(KEY_LEFT)) { 
+        } else if (keyboardPushed(KEY_LEFT) || keypadPushed(KEYPAD_LEFT)) { 
             x -= 5; // To the left
             playAnimation(bird, "left");
     
@@ -75,6 +77,6 @@
 		
 		requestAnimationFrame(renderGame);
 };
-</script>
-</body>
+        </script>
+    </body>
 </html>
